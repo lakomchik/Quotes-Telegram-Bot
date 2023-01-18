@@ -4,6 +4,8 @@ You need to write telegram bot that enable users extract quotes from UniswapV2 D
 
 There is a [great lib](https://docs.python-telegram-bot.org/en/stable/examples.html) for creating telegram bots on python. Read the documentantion and understand the details of implementation.
 
+Follow [this guide](https://core.telegram.org/bots/tutorial) to create your telegram bot and understand the core functionality.
+
 ## Functionality
 
 The telegram bot should have the following functionality. 
@@ -39,8 +41,8 @@ FX markets for pair identification. Thus, in the pair USDRUB USD is the foreign 
 
 Note that the commands
 ```
-\quote 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 0xdAC17F958D2ee523a2206206994597C13D831ec7
-\quote 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 USDT 16000000
+/quote 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 0xdAC17F958D2ee523a2206206994597C13D831ec7
+/quote 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2 USDT 16000000
 ``` 
 should be still valid, i.e. it should be indifferent for user to work either with adresses or with registered names  
 
@@ -74,14 +76,18 @@ It is reasonable to write 2 executable Python files for the project. The first o
 python telegram_bot.py 
     --provider-uri http://localhost:8545 \
     --bot-token 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11 \
-    --alert-db alerts.csv  
+    --alerts-db alerts.csv  
 ```
 The other python script
 ```
 python alert_handler.py
     --provider-uri http://localhost:8545 \
-    --alert-db alerts.csv
+    --bot-token 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11 \
+    --alerts-db alerts.csv
 ```
-should parse `alerts.csv` file and extract quotes for the alert messages. The quotes should be extracted for 
+should parse `alerts.csv` file and extract quotes for the alert messages. The quotes should be extracted via batch responses.
+```
+
+``` 
  
  
