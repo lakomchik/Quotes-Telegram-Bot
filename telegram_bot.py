@@ -1,11 +1,5 @@
 import argparse
-from utils.providers import get_provider_from_uri
-from web3 import Web3
-import logging
 from telegram.ext import Application, Updater, CommandHandler
-from omegaconf import OmegaConf
-import argparse
-from web3 import Web3
 
 
 parser = argparse.ArgumentParser(
