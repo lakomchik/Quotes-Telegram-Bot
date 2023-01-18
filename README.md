@@ -78,6 +78,16 @@ python telegram_bot.py
     --bot-token 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11 \
     --alerts-db alerts.csv  
 ```
+The template for `telefram_bot.py` is already written. [Create bot token](https://core.telegram.org/bots/tutorial) 
+and run the file via
+```
+python telegram_bot.py 
+    --provider-uri empty \
+    --bot-token <YOUR BOT TOKEN> \
+    --alerts-db empty  
+```
+to see how it works. 
+
 The other python script
 ```
 python alert_handler.py
