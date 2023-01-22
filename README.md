@@ -96,8 +96,7 @@ python alert_handler.py
     --alerts-db alerts.csv
 ```
 should parse `alerts.csv` file and extract quotes for the alert messages. The quotes should be extracted via batch responses.
-```
-
-``` 
+## Provider URI
+Unfortunately, [https://getblock.io/](https://getblock.io/) doesn't provide archive nodes in their free plan. For archive nodes one can use [https://www.infura.io/](https://www.infura.io/) or [https://www.alchemy.com/](https://www.alchemy.com/). Archive nodes provide the functionality for extracting any smart contract data as of any past block, while full nodes (as in [https://getblock.io/](https://getblock.io/)) keep this kind of data for the last 128 blocks.
  
  
