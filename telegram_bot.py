@@ -1,6 +1,8 @@
 import argparse
 from telegram.ext import Application, Updater, CommandHandler
 from quoter import Quoter
+import telegram
+import asyncio
 
 parser = argparse.ArgumentParser(
     prog="Quotes Telegram Bot",
@@ -21,19 +23,17 @@ async def regname(update, context):
     quoter.regname(token_name, token_address)
     # YOUR CODE GOES HERE
 
-    await update.message.reply_text("Please, add reply message")
+    await update.message.reply_text("Successfully registered the name for token")
 
 
 async def alert(update, context):
     if len(context.args) != 3:
         await update.message.reply_text("Error wrong input")
         return
-
+    chat_id = update.message.chat_id
     foreign, domestic, level = context.args
-
+    quoter.add_alert(foreign, domestic, level, chat_id)
     # YOUR CODE GOES HERE
-
-    await update.message.reply_text("Please, add reply message")
 
 
 async def quote(update, context):
@@ -61,12 +61,12 @@ async def quote(update, context):
     result = quoter.quote(
         foreign, domestic, int(block_start), int(block_end), int(step)
     )
+
     for i in range(len(result)):
         await update.message.reply_text(float(result[i]))
 
 
 def main():
-
     app = Application.builder().token(args.bot_token).build()
 
     # Adding commands
@@ -74,7 +74,6 @@ def main():
     app.add_handler(CommandHandler("alert", alert))
     app.add_handler(CommandHandler("quote", quote))
 
-    # Start the Bot
     app.run_polling()
 
 

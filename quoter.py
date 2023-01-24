@@ -6,6 +6,7 @@ import utils.providers as providers
 import utils.requests as requests
 from decimal import Decimal
 import numpy as np
+import pandas as pd
 
 
 def div(a, b):
@@ -17,11 +18,12 @@ class Quoter:
         self.provider_uri = uri
         self.w3 = Web3(Web3.HTTPProvider(self.provider_uri))
         self.batch_w3 = providers.get_provider_from_uri(self.provider_uri, batch=True)
+        sushiswap_adress = "0xC0AEe478e3658e2610c5F7A4A2E1777cE9e4f2Ac"
         uniswap_adress = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
         with open("const/json_abis/uniswapv2_factory.json", "r") as f:
             self.uniswap_abi = json.load(f)
         self.uniswap_contract = self.w3.eth.contract(
-            address=uniswap_adress, abi=self.uniswap_abi
+            address=sushiswap_adress, abi=self.uniswap_abi
         )
         with open("const/json_abis/erc20.json", "r") as f:
             self.erc20_abi = json.load(f)
@@ -105,3 +107,76 @@ class Quoter:
             foreign_amount = token0_amount
         res = list(map(div, foreign_amount, domestic_amount))
         return res
+
+    def add_alert(self, foreign_token, domestic_token, quote_level, chat_id):
+        # Collecting all data to form row in csv
+        if len(foreign_token) < 10:
+            foreign_name = foreign_token
+            foreign_token_adress = self.user_dict[foreign_token]
+        else:
+            foreign_name = foreign_token
+            foreign_token_adress = foreign_token
+
+        if len(domestic_token) < 10:
+            domestic_name = domestic_token
+            domestic_token_adress = self.user_dict[domestic_token]
+        else:
+            domestic_name = domestic_token
+            domestic_token_adress = domestic_token
+
+        chat_id = chat_id
+        level = quote_level
+        pair_adress = self.uniswap_contract.functions.getPair(
+            foreign_token_adress, domestic_token_adress
+        ).call()
+
+        pair_contract = self.w3.eth.contract(
+            address=Web3.toChecksumAddress(pair_adress), abi=self.uniswapv2_pair_abi
+        )
+
+        token0_adress = pair_contract.functions.token0().call()
+        token1_adress = pair_contract.functions.token1().call()
+
+        token0_contract = self.w3.eth.contract(
+            address=Web3.toChecksumAddress(token0_adress), abi=self.erc20_abi
+        )
+
+        token1_contract = self.w3.eth.contract(
+            address=Web3.toChecksumAddress(token1_adress), abi=self.erc20_abi
+        )
+        decimals0 = token0_contract.functions.decimals().call()
+        decimals1 = token1_contract.functions.decimals().call()
+
+        # addin row to table
+        alerts_table = pd.read_csv("alerts.csv")
+        new_row = {
+            "domestic_token": domestic_token_adress,
+            "domestic_name": domestic_name,
+            "foreign_token": foreign_token_adress,
+            "foreign_name": foreign_name,
+            "pair_adress": pair_adress,
+            "token0_adress": token0_adress,
+            "token1_adress": token1_adress,
+            "level": level,
+            "decimals0": decimals0,
+            "decimals1": decimals1,
+            "chat_id": chat_id,
+        }
+        alerts_table = alerts_table.append(new_row, ignore_index=True)
+        alerts_table.to_csv("alerts.csv", index=False)
+        pass
+
+
+columns = [
+    "domestic_token",
+    "domestic_name",
+    "foreign_token",
+    "foreign_name",
+    "pair_adress",
+    "token0_adress",
+    "token1_adress",
+    "level",
+    "decimals0",
+    "decimal1",
+    "chat_id",
+]
