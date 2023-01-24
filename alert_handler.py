@@ -11,4 +11,5 @@ parser.add_argument("--alerts-db", type=str, default=None, required=True)
 parser.add_argument("--provider-uri", type=str, default=None, required=True)
 args = parser.parse_args()
 
+
 # YOUR CODE GOES HERE
