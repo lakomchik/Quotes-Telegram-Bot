@@ -12,10 +12,6 @@ import matplotlib
 from PIL import Image
 import io
 
-font = {"family": "roboto", "weight": "bold", "size": 10}
-
-matplotlib.rc("font", **font)
-
 
 def div(a, b):
     return a / b
