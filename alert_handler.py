@@ -8,6 +8,9 @@ import utils.requests as requests
 import json
 from decimal import Decimal
 import time
+from quoter import Quoter
+import urllib
+from plotter import Plot
 
 parser = argparse.ArgumentParser(
     prog="Alerts Handler",
@@ -17,7 +20,7 @@ parser.add_argument("--alerts-db", type=str, default=None, required=True)
 parser.add_argument("--provider-uri", type=str, default=None, required=True)
 args = parser.parse_args()
 
-
+quoter = Quoter(args.provider_uri)
 # Function to write message to chat
 def telegram_bot_sendtext(message, chatID):
     bot_token = args.bot_token
@@ -32,6 +35,15 @@ def telegram_bot_sendtext(message, chatID):
     )
     response = tg_requests.get(send_text)
     return response.json()
+
+
+TOKEN = args.bot_token
+URL = "https://api.telegram.org/bot{}/".format(TOKEN)
+
+
+def send_image(doc, chat_id):
+    files = {"photo": open(doc, "rb")}
+    tg_requests.post(URL + "sendPhoto?chat_id={}".format(chat_id), files=files)
 
 
 class Alarmer:
@@ -65,14 +77,14 @@ class Alarmer:
         alerts_table = pd.read_csv(self.table_name)
         block = []
         # Prepating batch request
-        last_block_number = self.w3.eth.block_number
-        print("LAST BLOCK IS " + str(last_block_number))
+        self.last_block_number = self.w3.eth.block_number
+        print("LAST BLOCK IS " + str(self.last_block_number))
         for i in range(alerts_table.shape[0]):
             block.append(
                 requests.get_request_balanceof(
                     alerts_table["token0_adress"][i],
                     alerts_table["pair_adress"][i],
-                    last_block_number,
+                    self.last_block_number,
                     i * 2 + 0,
                 )
             )
@@ -80,7 +92,7 @@ class Alarmer:
                 requests.get_request_balanceof(
                     alerts_table["token1_adress"][i],
                     alerts_table["pair_adress"][i],
-                    last_block_number,
+                    self.last_block_number,
                     i * 2 + 1,
                 )
             )
@@ -112,6 +124,26 @@ class Alarmer:
                 )
                 del_ids.append(i)
                 telegram_bot_sendtext(msg, str(alerts_table["chat_id"][i]))
+                # send_image("res.png", str(alerts_table["chat_id"][i]))
+                step = 1
+                result = quoter.quote(
+                    alerts_table["foreign_token"][i],
+                    alerts_table["domestic_token"][i],
+                    int(alerts_table["entry_block"][i]),
+                    int(self.last_block_number),
+                    int(step),
+                )
+                block_list = range(
+                    int(alerts_table["entry_block"][i]),
+                    int(self.last_block_number),
+                    int(step),
+                )
+                data = [price for price in result]
+                plotter = Plot()  ###
+                plotter.draw_data(block_list, data, data[0], data[len(data) - 1])
+                send_image("quote_plot.png", str(alerts_table["chat_id"][i]))
+                plotter.delete_picture()
+
         alerts_table = alerts_table.drop(del_ids)
         alerts_table.to_csv(self.table_name, index=False)
 

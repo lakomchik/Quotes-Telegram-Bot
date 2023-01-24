@@ -197,6 +197,7 @@ class Quoter:
             "decimals0": decimals0,
             "decimals1": decimals1,
             "chat_id": chat_id,
+            "entry_block": self.w3.eth.block_number,
         }
         alerts_table = alerts_table.append(new_row, ignore_index=True)
         alerts_table.to_csv("alerts.csv", index=False)

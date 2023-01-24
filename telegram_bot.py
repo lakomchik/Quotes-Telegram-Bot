@@ -85,7 +85,7 @@ async def quote(update, context):
             + str(block_start)
             + " of "
             + foreign
-            + "/"
+            + " / "
             + domestic
             + " "
             + str(result[0])[0:10]
@@ -96,6 +96,21 @@ async def quote(update, context):
         foreign, domestic, block_start = context.args
         block_end = int(block_start) + 1
         step = 1
+        result = quoter.quote(
+            foreign, domestic, int(block_start), int(block_end), int(step)
+        )
+        msg = (
+            "Level in block "
+            + str(block_start)
+            + " of "
+            + foreign
+            + " / "
+            + domestic
+            + " "
+            + str(result[0])[0:10]
+        )
+        await update.message.reply_text(msg)
+        return
     elif len(context.args) == 4:
         foreign, domestic, block_start, block_end = context.args
         step = 1
