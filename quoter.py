@@ -7,6 +7,14 @@ import utils.requests as requests
 from decimal import Decimal
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib
+from PIL import Image
+import io
+
+font = {"family": "roboto", "weight": "bold", "size": 10}
+
+matplotlib.rc("font", **font)
 
 
 def div(a, b):
@@ -108,6 +116,38 @@ class Quoter:
         res = list(map(div, foreign_amount, domestic_amount))
         return res
 
+    def make_plot(
+        self, foreign_token, domestic_token, start_block_id, end_block_id, step
+    ):
+        data = self.quote(
+            foreign_token, domestic_token, start_block_id, end_block_id, step
+        )
+        plt.locator_params(nbins=4)
+        x_ax = list(map(str, [*range(start_block_id, end_block_id, step)]))
+        my_dpi = 100
+        plt.figure(figsize=(1000 / my_dpi, 700 / my_dpi), dpi=my_dpi)
+        # plt.locator_params(axis="y", numticks=6)
+        # plt.locator_params(axis="x", numticks=5)
+
+        plt.style.use("dark_background")
+
+        plt.plot(x_ax, data)
+        plt.locator_params(axis="x", nbins=3)
+        plt.xticks(rotation=45)
+        plt.grid(c="cyan")
+
+        plt.savefig("res.png")
+        plt.draw()
+        # data = self.quote(
+        #     foreign_token, domestic_token, start_block_id, end_block_id, step
+        # )
+        # x_data = list(map(str, [*range(start_block_id, end_block_id, step)]))
+        # figure, ax = plt.subplots()
+        # ax.set_xticks(rotation=45)
+        # ax.plot(x_data, data)
+
+        # plt.savefig("res.png")
+
     def add_alert(self, foreign_token, domestic_token, quote_level, chat_id):
         # Collecting all data to form row in csv
         if len(foreign_token) < 10:
@@ -164,19 +204,3 @@ class Quoter:
         }
         alerts_table = alerts_table.append(new_row, ignore_index=True)
         alerts_table.to_csv("alerts.csv", index=False)
-        pass
-
-
-columns = [
-    "domestic_token",
-    "domestic_name",
-    "foreign_token",
-    "foreign_name",
-    "pair_adress",
-    "token0_adress",
-    "token1_adress",
-    "level",
-    "decimals0",
-    "decimal1",
-    "chat_id",
-]

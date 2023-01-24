@@ -66,6 +66,7 @@ class Alarmer:
         block = []
         # Prepating batch request
         last_block_number = self.w3.eth.block_number
+        print("LAST BLOCK IS " + str(last_block_number))
         for i in range(alerts_table.shape[0]):
             block.append(
                 requests.get_request_balanceof(
@@ -111,7 +112,6 @@ class Alarmer:
                 )
                 del_ids.append(i)
                 telegram_bot_sendtext(msg, str(alerts_table["chat_id"][i]))
-        print(del_ids)
         alerts_table = alerts_table.drop(del_ids)
         alerts_table.to_csv(self.table_name, index=False)
 
