@@ -10,7 +10,7 @@ class Plot:
         fig.autofmt_xdate(rotation=45)
         plt.tick_params(labelsize=15)
         ax.plot(block_number_list, quotes, linewidth=6)
-        ax.xaxis.set_major_locator(plt.MaxNLocator(6))
+        ax.xaxis.set_major_locator(plt.MaxNLocator(8))
         ax.yaxis.set_major_locator(plt.MaxNLocator(7))
         ax.set_xlabel("Block number", fontsize=20)
         ax.set_ylabel("Quote", fontsize=20)

@@ -51,6 +51,7 @@ async def start(update, context):
     await update.message.reply_text(
         f"Next commands are available in this bot:\n \
         /start - Repeat all this bullshit for you again\n \
+        /regname <TOKEN NAME> <TOKEN ADDRESS> - Register token name for specified token adress\n \
         /quote <FOREIGN TOKEN ADDRESS/NAME> <DOMESTIC TOKEN ADDRESS/NAME> [<BLOCK INDENTIFIER>] [<BLOCK IDENTIFIER>] [<DELTA BLOCKS>] - Get information about price of foreign token in domestic token\n \
         /alert <FOREIGN TOKEN ADDRESS/NAME> <DOMESTIC TOKEN ADDRESS/NAME> <QUOTE LEVEL> - Get information when price will overcome threshold you have designated"
     )
@@ -64,6 +65,7 @@ async def alert(update, context):
     foreign, domestic, level = context.args
     quoter.add_alert(foreign, domestic, level, chat_id)
     # YOUR CODE GOES HERE
+    await update.message.reply_text("Successfully registered alert!!!!")
 
 
 async def quote(update, context):
@@ -122,7 +124,7 @@ async def quote(update, context):
     result = quoter.quote(
         foreign, domestic, int(block_start), int(block_end), int(step)
     )
-    await update.message.reply_text("AUCHTUNG!!!!")
+    await update.message.reply_text("Quote request registered. Wait for response.")
 
     plotter = Plot()  ###
     block_list = range(int(block_start), int(block_end), int(step))
