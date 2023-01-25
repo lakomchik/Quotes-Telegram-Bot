@@ -114,7 +114,13 @@ class Alarmer:
             if values[i] > float(alerts_table["level"][i]):
                 del_ids.append(i)
                 # send_image("res.png", str(alerts_table["chat_id"][i]))
-                step = 1
+                step = str(
+                    (int(self.last_block_number) - int(alerts_table["entry_block"][i]))
+                    // 30
+                    + 1
+                )
+                print("STEP")
+                print(step)
                 result = quoter.quote(
                     alerts_table["foreign_token"][i],
                     alerts_table["domestic_token"][i],

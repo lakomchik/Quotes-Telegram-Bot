@@ -77,7 +77,7 @@ async def quote(update, context):
     elif len(context.args) == 2:
         foreign, domestic = context.args
         block_start = quoter.w3.eth.block_number
-        block_end = block_start + 1
+        block_end = int(block_start) + 1
         step = 1
         result = quoter.quote(
             foreign, domestic, int(block_start), int(block_end), int(step)
@@ -121,12 +121,18 @@ async def quote(update, context):
     else:
         await update.message.reply_text("AUCHTUNG!!!! TO MUCH ARGUMENTS")
         return
-    result = quoter.quote(
-        foreign, domestic, int(block_start), int(block_end), int(step)
-    )
+
     await update.message.reply_text("Quote request registered. Wait for response.")
 
     plotter = Plot()  ###
+    print("STEPS AMOUNT = " + str((int(block_end) - int(block_start)) // int(step)))
+    if (int(block_end) - int(block_start)) // int(step) > 30:
+        step = str((int(block_end) - int(block_start)) // 30 + 1)
+        print("NEW STEP" + step)
+
+    result = quoter.quote(
+        foreign, domestic, int(block_start), int(block_end), int(step)
+    )
     block_list = range(int(block_start), int(block_end), int(step))
     data = [price for price in result]
 
