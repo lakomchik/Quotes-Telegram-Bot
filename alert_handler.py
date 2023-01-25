@@ -112,18 +112,7 @@ class Alarmer:
         del_ids = []  # list of row indexes that should be deleted in case alarm
         for i in range(len(values)):
             if values[i] > float(alerts_table["level"][i]):
-                msg = (
-                    "ACHTUNG!!!\n Level of "
-                    + alerts_table["foreign_name"][i]
-                    + "/"
-                    + alerts_table["domestic_name"][i]
-                    + " is higher than "
-                    + str(alerts_table["level"][i])
-                    + ".\n Current level is "
-                    + str(values[i])[0:10]
-                )
                 del_ids.append(i)
-                telegram_bot_sendtext(msg, str(alerts_table["chat_id"][i]))
                 # send_image("res.png", str(alerts_table["chat_id"][i]))
                 step = 1
                 result = quoter.quote(
@@ -140,9 +129,25 @@ class Alarmer:
                 )
                 data = [price for price in result]
                 plotter = Plot()  ###
-                plotter.draw_data(block_list, data, data[0], data[len(data) - 1])
-                send_image("quote_plot.png", str(alerts_table["chat_id"][i]))
-                plotter.delete_picture()
+                if len(data) > 1:
+                    msg = (
+                        "ACHTUNG!!!\n Level of "
+                        + alerts_table["foreign_name"][i]
+                        + "/"
+                        + alerts_table["domestic_name"][i]
+                        + " is higher than "
+                        + str(alerts_table["level"][i])
+                        + ".\n Current level is "
+                        + str(values[i])[0:10]
+                    )
+                    del_ids.append(i)
+                    telegram_bot_sendtext(msg, str(alerts_table["chat_id"][i]))
+                    plotter.draw_data(block_list, data, data[0], data[len(data) - 1])
+                    send_image("quote_plot.png", str(alerts_table["chat_id"][i]))
+                    plotter.delete_picture()
+                else:
+                    msg = "OMG, you setted alarm on price which one is lower than the current one "
+                    telegram_bot_sendtext(msg, str(alerts_table["chat_id"][i]))
 
         alerts_table = alerts_table.drop(del_ids)
         alerts_table.to_csv(self.table_name, index=False)
